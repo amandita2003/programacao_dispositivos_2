@@ -17,7 +17,7 @@ const CachorroManter =() =>{
     const salvar = () =>{
         const cachorroRefComId = refCachorro.doc()
         const cachorro = new Cachorro(formCachorro)
-        cachorro.id = cachorroRefComId
+        cachorro.id = cachorroRefComId.id
         
         console.log(cachorro)
         cachorroRefComId.set(cachorro.toFirestore()).then(()=>{
