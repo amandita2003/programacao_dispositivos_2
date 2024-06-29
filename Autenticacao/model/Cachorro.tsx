@@ -4,6 +4,7 @@ export class Cachorro{
     public sexo: string;
     public datanasc: string;
     public raca: string;
+    public urlfoto: string;
 
     constructor(obj?: Partial<Cachorro>){
         if(obj){
@@ -12,6 +13,7 @@ export class Cachorro{
             this.sexo = obj.sexo;
             this.datanasc=obj.datanasc;
             this.raca = obj.raca;
+            this.urlfoto = obj.urlfoto
         }
     } 
     
@@ -22,6 +24,7 @@ export class Cachorro{
             sexo: this.sexo,
             datanasc: this.datanasc,
             raca:this.raca,
+            urlfoto:this.urlfoto,
             
         }
         return cachorro
@@ -33,6 +36,7 @@ export class Cachorro{
         "sexo":${this.sexo},
         "datanasc:"${this.datanasc},
         "raca:"${this.raca},
+        "urlfoto:"${this.urlfoto},
         }`
         return objeto
     }
