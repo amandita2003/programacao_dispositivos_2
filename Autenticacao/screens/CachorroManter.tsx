@@ -1,15 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import React, {useEffect, useState} from "react";
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, Pressable } from "react-native";
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, Pressable, Image, FlatList, } from "react-native";
 import { auth, firestore, storage } from "../firebase";
 import { Cachorro } from "../model/Cachorro";
 import meuestilo from "../meuestilo";
 import * as ImagePicker from "expo-image-picker"
 import {uploadBytes} from "firebase/storage"
+import {  ScrollView } from "react-native-gesture-handler";
 
 const CachorroManter =() =>{
     const [formCachorro, setFormCachorro]=
     useState<Partial<Cachorro>>({})
+
+    const [cachorros, setCachorros] = useState<Cachorro[]>([])
+
+    const [loading, setLoading] = useState(true)
 
     const navigation = useNavigation()
 
@@ -32,6 +37,7 @@ const CachorroManter =() =>{
 
     const cancelar = () =>{
        setFormCachorro({}) 
+       setPickerImagePath("")
     }
 
     const escolheFoto = () =>{
@@ -91,12 +97,61 @@ const CachorroManter =() =>{
         }
     }
 
+    useEffect(() =>{
+        if(loading){
+            const subscriber = refCachorro.onSnapshot((querySnapshot) =>{
+                const cachorros = []
+                querySnapshot.forEach((documentSnapshot)=>{
+                    cachorros.push({
+                        ...documentSnapshot.data(),
+                        key: documentSnapshot.id
+                    })
+
+                    setCachorros(cachorros)
+                    setLoading(false)
+                });
+            })
+        }
+    }, [cachorros])
+
+    const Item = ({item}) => (
+        <View style={meuestilo.item}>
+            <Pressable
+                onPress={()=>alert("editar")}
+                onLongPress={()=>alert("excluir")}>
+                <Image
+                    style={meuestilo.image}
+                    source={{
+                    uri: item.urlfoto
+                    }}
+                />
+                <View>
+                    <Text style={meuestilo.title}>Nome:{item.nome}</Text>
+                    <Text style={meuestilo.title}>Raça:{item.raca}</Text>
+                    <Text style={meuestilo.title}>Sexo:{item.sexo}</Text>
+                    <Text style={meuestilo.title}>Data de nascimento:{item.datanasc}</Text>
+                </View>
+            </Pressable>
+        </View>
+    )
+    const renderItem = ({item}) => <Item item={item}/>
+
     return(
-        <KeyboardAvoidingView style={meuestilo.container}>
-            <View style={meuestilo.inputContainer}>
+        <ScrollView>
+            <KeyboardAvoidingView style={meuestilo.container}>
                 <Pressable onPress={()=> escolheFoto()}>
-                    <Text>Foto</Text>
+                    {pickerImagePath === "" &&(
+                        <Image source={require("../assets/camera2.png")} style={meuestilo.imagem}/>
+                    )}
+                    {pickerImagePath !== "" && (
+                        <Image source={{uri: pickerImagePath}} style={meuestilo.image}/>
+                        )}
+                    
+                    
                 </Pressable>
+            <View style={meuestilo.inputContainer}>
+                
+                
             <TextInput
                 placeholder="Nome"
                 value={formCachorro.nome}
@@ -130,8 +185,16 @@ const CachorroManter =() =>{
                     <Text style={meuestilo.buttonOutlineText}>Salvar</Text>
                 </TouchableOpacity>
             </View>
+                <FlatList
+            data={cachorros}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+                />
+
+            
             
             </KeyboardAvoidingView>
+        </ScrollView>
 
     )
     }
