@@ -24,15 +24,27 @@ const CachorroManter =() =>{
     .collection("Cachorro")
 
     const salvar = () =>{
-        const cachorroRefComId = refCachorro.doc()
         const cachorro = new Cachorro(formCachorro)
-        cachorro.id = cachorroRefComId.id
+        if(cachorro.id === undefined){
+            const cachorroRefComId = refCachorro.doc()
+        
+            cachorro.id = cachorroRefComId.id
         
         console.log(cachorro)
         cachorroRefComId.set(cachorro.toFirestore()).then(()=>{
             alert("Cachorro "+cachorro.nome+" adicionado com sucesso")
             cancelar()
         })
+        } else{
+                const cachorroRefComId = refCachorro.doc(cachorro.id)
+                cachorroRefComId.update(cachorro.toFirestore()).then(()=>{
+                    alert("Cachorro atualizado com sucesso!")
+                    cancelar()
+                })
+
+        }
+
+        
     }
 
     const cancelar = () =>{
@@ -114,11 +126,29 @@ const CachorroManter =() =>{
         }
     }, [cachorros])
 
+    const editCachorro = async(cachorro: Cachorro) =>{
+        const result = firestore.collection('Usuario').doc(auth.currentUser?.uid).collection('Cachorro').doc(cachorro.id)
+        .onSnapshot(documentSnapshot =>{
+            const cachorro = new Cachorro(documentSnapshot.data())
+            setFormCachorro(cachorro)
+            setPickerImagePath(cachorro.urlfoto)
+            //console.log(cachorro)
+        })
+
+    }
+    const deleteCachorro = async(cachorro: Cachorro) =>{
+        const result = await refCachorro.doc(cachorro.id).delete().then(() =>{
+            alert('Cachorro deletado')
+            cancelar()
+        })
+    }
+
+
     const Item = ({item}) => (
         <View style={meuestilo.item}>
             <Pressable
-                onPress={()=>alert("editar")}
-                onLongPress={()=>alert("excluir")}>
+                onPress={()=>editCachorro(item)}
+                onLongPress={()=>deleteCachorro(item)}>
                 <Image
                     style={meuestilo.image}
                     source={{

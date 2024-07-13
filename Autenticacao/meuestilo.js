@@ -23,7 +23,7 @@ export default StyleSheet.create({
     marginTop: 40,
   },
   button: {
-    backgroundColor: "#0782F9",
+    backgroundColor: "#f3c6e3",
     width: "100%",
     padding: 15,
     borderRadius: 10,
@@ -32,7 +32,7 @@ export default StyleSheet.create({
   buttonOutline: {
     backgroundColor: "white",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "#f3c6e3",
     borderWidth: 2,
   },
   buttonText: {
@@ -41,7 +41,7 @@ export default StyleSheet.create({
     fontSize: 16,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "#f3c6e3",
     fontWeight: "700",
     fontSize: 16,
   },
@@ -61,13 +61,13 @@ export default StyleSheet.create({
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
-    borderColor: "#0782F9",
+    borderColor: "#f3c6e3",
     borderWidth: 2,
     borderRadius: 10,
   },
   title: {
     fontSize: 16,
-    color: "#0782F9",
+    color: "#493b44",
     fontWeight: "700",
   },
 
@@ -78,7 +78,7 @@ export default StyleSheet.create({
   },
 
   itemStyle: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#f3c6e3",
     padding: 10,
     marginVertical: 8,
     marginHorizontal: 10,
@@ -188,6 +188,7 @@ export default StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 100,
+    marginLeft: 80,
   },
   imagem: {
     width: 80,
