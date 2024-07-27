@@ -27,13 +27,13 @@ const ManterVacina = (props) => {
     }
 
     const salvar = async() => {        
-        const vacina = new Vacina(formVacina);
-
-        console.log(vacina.id);
+        const vacina = new Vacina(formVacina);        
 
         if (vacina.id === undefined){ 
             const vacinaRefComId = vacinaRef.doc();
             vacina.id = vacinaRefComId.id;
+
+            console.log(vacina.id);
 
             vacinaRefComId.set(vacina.toFirestore()).then(() => {
                 alert("Vacina " + vacina.nome + " adicionado!")
@@ -130,9 +130,18 @@ const ManterVacina = (props) => {
                     placeholder="Vacina"
                     style={meuestilo.input}
                     value={formVacina.nome}
-                    onChangeText={vacina => setFormVacina({
+                    onChangeText={nome => setFormVacina({
                         ...formVacina, 
-                        vacina: vacina
+                        nome: nome
+                    })}
+                />
+                <TextInput 
+                    placeholder="Dose"
+                    style={meuestilo.input}
+                    value={formVacina.dose}
+                    onChangeText={dose => setFormVacina({
+                        ...formVacina, 
+                        dose: dose
                     })}
                 />
             </View>

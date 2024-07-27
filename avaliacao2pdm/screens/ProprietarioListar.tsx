@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from "react";
 import {auth, firestore} from "../firebase";
 import meuestilo from "../meuestilo";
-import { Vacina } from "../model/Vacina";
+import { Proprietario } from "../model/Proprietario";
 import {Text, FlatList, View, ActivityIndicator, Image} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const ListarVacinas = () => {
+const ListarProprietarios = () => {
     const [loading,setLoading] = useState(true);
-    const [vacinas, setVacinas] = useState<Vacina[]>([]);
-    const vacinaRef = 
+    const [proprietarios, setProprietarios] = useState<Proprietario[]>([]);
+    const proprietarioRef = 
       firestore.collection('Usuario').doc(auth.currentUser?.uid)
-      .collection('Vacina');
+      .collection('Proprietario');
 
     useEffect(() => {
-        const subscriber = vacinaRef
+        const subscriber = proprietarioRef
         .onSnapshot((querySnapshot) => {
-            const vacinas = [];
+            const proprietarios = [];
             querySnapshot.forEach((documentSnapshot) => {
-                vacinas.push({
+                proprietarios.push({
                     ...documentSnapshot.data(),
                     key: documentSnapshot.id
                 });
             });
-            setVacinas(vacinas);
+            setProprietarios(proprietarios);
             setLoading(false);
         });
         return () => subscriber();
-    }, [vacinas])
+    }, [proprietarios])
 
     if (loading) {
         return <ActivityIndicator />;
@@ -36,7 +36,7 @@ const ListarVacinas = () => {
         <View style={meuestilo.item} >
             <View style={meuestilo.alinhamentoLinha}>
                 <View style={meuestilo.alinhamentoColuna}>
-                    <Text style={meuestilo.title}>Vacina: {item.nome}</Text>
+                    <Text style={meuestilo.title}>Proprietario: {item.nome}</Text>
                 </View>
             </View>
         </View>
@@ -47,7 +47,7 @@ const ListarVacinas = () => {
     return (
         <SafeAreaView style={meuestilo.containerlistar}>
             <FlatList 
-                data={vacinas}
+                data={proprietarios}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
             />
@@ -55,4 +55,4 @@ const ListarVacinas = () => {
     );
 }
 
-export default ListarVacinas;
+export default ListarProprietarios;

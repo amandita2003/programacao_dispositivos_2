@@ -7,11 +7,12 @@ import meuestilo from "../meuestilo";
 import { Animal } from "../model/Animal";
 import * as ImagePicker from "expo-image-picker";
 import { uploadBytes } from "firebase/storage";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, ScrollView } from "react-native-gesture-handler";
 
-import { EscolheRaca } from "./EscolheVacina";
+import { EscolheVacina } from "./EscolheVacina";
 import { Vacina } from "../model/Vacina";
 import { Proprietario } from "../model/Proprietario";
+import { EscolheProprietario } from "./EscolheProprietario";
 
 const ManterAnimal = (props) => {
     const [formAnimal, setFormAnimal] = useState<Partial<Animal>>({})
@@ -29,6 +30,10 @@ const ManterAnimal = (props) => {
 
     const AnimalRef = firestore.collection('Usuario').doc(auth.currentUser?.uid)
                         .collection('Animal')
+    const [formProprietario, setFormProprietario] = useState<Partial<Proprietario>>({});
+    const [modalProprietarioVisible, setModalProprietarioVisible] = useState(false);
+    const proprietarioRef = firestore.collection('Usuario').doc(auth.currentUser?.uid)
+                                .collection('Proprietario');
 
     const limparFormulario=()=>{
         setFormAnimal({});
@@ -40,11 +45,17 @@ const ManterAnimal = (props) => {
         setPickerImagePath('');
     }
 
-    const setRaca = async(item) => {
+    const setVacina = async(item) => {
         const doc = await racaRef.doc(item.id).get();
         const vacina = new Vacina(doc.data());
         setFormVacina(vacina);
         setFormAnimal({...formAnimal, vacina: vacina.toFirestore() });
+    }
+    const setProprietario = async(item) => {
+        const doc = await proprietarioRef.doc(item.id).get();
+        const proprietario = new Proprietario(doc.data());
+        setFormProprietario(proprietario);
+        setFormAnimal({...formAnimal, proprietario: proprietario.toFirestore() });
     }
 
     const salvar = async() => {        
@@ -146,20 +157,23 @@ const ManterAnimal = (props) => {
     }
 
     useEffect(() => {
-        const subscriber = AnimalRef
-        .onSnapshot((querySnapshot) => {
-            const animais = [];
-            querySnapshot.forEach((documentSnapshot) => {
-                animais.push({
-                    ...documentSnapshot.data(),
-                    key: documentSnapshot.id
+        if(loading){
+            const subscriber = AnimalRef
+            .onSnapshot((querySnapshot) => {
+                const animais = [];
+                querySnapshot.forEach((documentSnapshot) => {
+                    animais.push({
+                        ...documentSnapshot.data(),
+                        key: documentSnapshot.id
+                    });
                 });
+                setAnimais(animais);
+                setLoading(false);
+                setIsRefreshing(false);
             });
-            setAnimais(animais);
-            setLoading(false);
-            setIsRefreshing(false);
-        });
-        return () => subscriber();
+            return () => subscriber();
+        }
+        
     }, [animais])
 
     const editAnimal = async (animal: Animal) => {       
@@ -205,13 +219,10 @@ const ManterAnimal = (props) => {
                     onPress={() => editAnimal(item) }
                 >
                     <View style={meuestilo.alinhamentoLinha}>
-                        <Image style={{ height: 80, width: 80, borderRadius: 10 }} source={{ uri: item.urlfoto}} />
+                        <Image style={{ height: 80, width: 80, borderRadius: 100, marginRight:10 }} source={{ uri: item.urlfoto}} />
 
                         <View style={meuestilo.alinhamentoColuna}>
                             <Text style={meuestilo.title}>Nome: {item.nome}</Text>
-                            {item.especie != null ?
-                                <Text style={meuestilo.title}>Especie: {item.especie}</Text> : <Text style={meuestilo.title}>Raça: Não definida</Text> 
-                            }
                             <Text style={meuestilo.title}>Sexo: {item.sexo}</Text>
                             <Text style={meuestilo.title}>Data Nasc: {item.datanasc}</Text>
                         </View>
@@ -223,15 +234,16 @@ const ManterAnimal = (props) => {
 
 
     return(
+    <ScrollView>
         <KeyboardAvoidingView style={meuestilo.container}>
             <Pressable onPress={() => escolheFoto()}>
                 {pickerImagePath !== "" && (
                     <Image source={{ uri: pickerImagePath }} 
-                        style={meuestilo.image} />
+                        style={meuestilo.imagem} />
                 )}
                 {pickerImagePath === "" && (
                     <Image source={require("../assets/camera.jpg")} 
-                        style={meuestilo.image} />
+                        style={meuestilo.imagem} />
                 )}
             </Pressable>
 
@@ -256,19 +268,45 @@ const ManterAnimal = (props) => {
                     }}>
                     <View style={meuestilo.centeredView}>
                         <View style={meuestilo.modalView}>
-                            <EscolheRaca 
-                                setModalRacaVisible={setModalVacinaVisible}
-                                setRaca={setRaca}    
+                            <EscolheVacina 
+                                setModalVacinaVisible={setModalVacinaVisible}
+                                setVacina={setVacina}    
+                            />
+                        </View>
+                    </View>
+                    
+                 </Modal>
+                <Pressable 
+                    style={[meuestilo.buttonModal, meuestilo.buttonOpen]}
+                    onPress={() => setModalVacinaVisible(true)}        
+                >
+                    <Text style={meuestilo.textStyle}>
+                        Vacina: {formAnimal.vacina?.nome}
+                    </Text>
+                </Pressable>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalProprietarioVisible}
+                    onRequestClose={() =>{
+                        Alert.alert("Fechar modal");
+                        setModalProprietarioVisible(!modalProprietarioVisible);
+                    }}>
+                    <View style={meuestilo.centeredView}>
+                        <View style={meuestilo.modalView}>
+                            <EscolheProprietario 
+                                setModalProprietarioVisible={setModalProprietarioVisible}
+                                setProprietario={setProprietario}    
                             />
                         </View>
                     </View>
                 </Modal>
                 <Pressable 
                     style={[meuestilo.buttonModal, meuestilo.buttonOpen]}
-                    onPress={() => setModalVacinaVisible(true)}        
+                    onPress={() => setModalProprietarioVisible(true)}        
                 >
                     <Text style={meuestilo.textStyle}>
-                        Vacina: {formAnimal.vacina?.vacina}
+                        Proprietario: {formAnimal.proprietario?.nome}
                     </Text>
                 </Pressable>
 
@@ -310,6 +348,7 @@ const ManterAnimal = (props) => {
             />
 
         </KeyboardAvoidingView>
+        </ScrollView>
     );
 }
 

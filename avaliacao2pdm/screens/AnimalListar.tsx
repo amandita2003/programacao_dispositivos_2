@@ -39,7 +39,6 @@ const ListarAnimais = () => {
 
                 <View style={meuestilo.alinhamentoColuna}>
                     <Text style={meuestilo.title}>Nome: {item.nome}</Text>
-                    <Text style={meuestilo.title}>Especie: {item.especie}</Text>
                     <Text style={meuestilo.title}>Sexo: {item.sexo}</Text>
                     <Text style={meuestilo.title}>Data Nasc: {item.datanasc}</Text>
                 </View>
